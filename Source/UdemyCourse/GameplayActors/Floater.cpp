@@ -2,6 +2,7 @@
 
 
 #include "Floater.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AFloater::AFloater()
@@ -20,7 +21,14 @@ AFloater::AFloater()
 	bInitializedFloaterLocation = false;
 	bShouldFloat = false;
 
+	InitialForce = FVector(200000.f, 0.0f, 0.0f);
+	InitialTorque = FVector(200000.f, 0.0f, 0.0f);
 
+	RunningTime = 0.f;
+
+	A = 1.f;
+	B = 1.f;
+	C = 1.f;
 
 }
 
@@ -28,6 +36,17 @@ AFloater::AFloater()
 void AFloater::BeginPlay()
 {
 	Super::BeginPlay();
+
+	float InitialX = FMath::FRandRange(-500.f,500.f);
+	float InitialY = FMath::FRandRange(-500.f,500.f);
+	float InitialZ = FMath::FRandRange(-500.f,500.f);
+
+	InitialLocation.X = InitialX;
+	InitialLocation.Y = InitialY;
+	InitialLocation.Z = InitialZ;
+
+	//InitialLocation *= 10.f;
+
 
 	PlacedLocation = GetActorLocation();
 
@@ -38,6 +57,17 @@ void AFloater::BeginPlay()
 
 	SetActorLocation(InitialLocation);
 	
+	FHitResult HitResult;
+
+	//StaticMesh->AddForce(InitialForce);
+	//StaticMesh->AddTorque(InitialTorque);
+
+	//FVector LocalOffset = FVector(200.f, 0.0f, 0.0f);
+
+	//FRotator Rotation = FRotator(30.0f,0.0f,0.0f);
+
+	//AddActorLocalRotation(Rotation);
+	//AddActorLocalOffset(LocalOffset, false, &HitResult);
 }
 
 // Called every frame
@@ -46,8 +76,16 @@ void AFloater::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (bShouldFloat)
 	{
-		FHitResult HitResult;
-		AddActorLocalOffset(InitialDirection, false, &HitResult);
+		//FHitResult HitResult;
+		//AddActorLocalOffset(InitialDirection, false, &HitResult);
+		FVector NewLocation = GetActorLocation();
+		
+		NewLocation.Z = NewLocation.Z + A*FMath::Sin(B*RunningTime) + C;
+
+		SetActorLocation(NewLocation);
+
+		RunningTime += DeltaTime;
+
 	}
 }
 
